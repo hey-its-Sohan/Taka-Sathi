@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Sora', 'Noto Sans Bengali', sans-serif;
+}
+
+/* Bangla text gets the Bengali-first stack automatically wherever it appears,
+   since the base font-family already lists Noto Sans Bengali as a fallback —
+   this class is for spans that are Bangla-only and should prioritize it. */
+.font-bn {
+  font-family: 'Noto Sans Bengali', 'Inter', sans-serif;
+}
+
+@layer components {
+  .card-surface {
+    @apply bg-base-100 rounded-2xl shadow-card border border-base-300/60;
+  }
+
+  .btn-brand {
+    @apply btn border-none text-primary-content hover:brightness-110 transition;
+    background: linear-gradient(135deg, #0F766E 0%, #115E59 55%, #0B2B26 100%);
+  }
+
+  .stat-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+  }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
