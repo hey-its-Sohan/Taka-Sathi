@@ -149,6 +149,14 @@ async function generateText(userPrompt, { systemPrompt } = {}) {
 /* Ollama installed. Toggle via GEMMA_MOCK_MODE=true in .env.                 */
 /* -------------------------------------------------------------------------- */
 function mockChatCompletion(messages, tools) {
+  const lastMsg = messages[messages.length - 1];
+  if (lastMsg && lastMsg.role === "tool") {
+    return {
+      role: "assistant",
+      content: "Transaction parsed successfully.",
+    };
+  }
+
   const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
   const text = lastUserMsg?.content || "";
 

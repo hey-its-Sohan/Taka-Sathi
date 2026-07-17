@@ -21,7 +21,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-otp');
+    const user = await User.findById(decoded.id);
 
     if (!user) {
       throw new ApiError(401, 'Not authorized — user no longer exists');
@@ -30,6 +30,7 @@ const protect = asyncHandler(async (req, res, next) => {
     req.user = user; // attach to request for downstream controllers
     next();
   } catch (err) {
+    console.error('JWT Verification error:', err.message);
     throw new ApiError(401, 'Not authorized — invalid or expired token');
   }
 });

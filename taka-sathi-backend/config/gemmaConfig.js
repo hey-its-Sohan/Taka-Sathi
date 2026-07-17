@@ -12,7 +12,7 @@
 
 module.exports = {
   baseUrl: process.env.GEMMA_BASE_URL || "http://127.0.0.1:11434",
-  model: process.env.GEMMA_MODEL || "gemma4:4b",
+  model: process.env.GEMMA_MODEL || "gemma4:e4b",
   timeoutMs: parseInt(process.env.GEMMA_TIMEOUT_MS, 10) || 30000,
   mockMode: process.env.GEMMA_MOCK_MODE === "true",
   // Keep temperature low — this app is decision support, not creative writing.

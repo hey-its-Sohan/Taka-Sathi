@@ -113,7 +113,7 @@ Visit **http://localhost:5173**. Log in with any phone number in the format `+88
 | `OTP_EXPIRES_IN_MINUTES`    | `5`                                    | How long an OTP stays valid                                                                                                                                  |
 | `OTP_DEMO_MODE`             | `true`                                 | When `true`, OTP is always `123456` and logged to console instead of sent via SMS — keep `true` for hackathon demos                                          |
 | `GEMMA_BASE_URL`            | `http://127.0.0.1:11434`               | Ollama server address                                                                                                                                        |
-| `GEMMA_MODEL`               | `gemma4:4b`                            | Must match the exact tag pulled in Ollama (`ollama list` to check)                                                                                           |
+| `GEMMA_MODEL`               | `gemma4:e4b`                            | Must match the exact tag pulled in Ollama (`ollama list` to check)                                                                                           |
 | `GEMMA_TIMEOUT_MS`          | `30000`                                | Max wait time per inference call                                                                                                                             |
 | `GEMMA_MOCK_MODE`           | `true` / `false`                       | `true` = no live model calls, canned responses (build without Ollama running). Set `false` once Ollama + Gemma 4 are working, and before recording your demo |
 | `CLIENT_ORIGIN`             | `http://localhost:5173`                | Allowed CORS origin — must match the frontend's dev URL                                                                                                      |
@@ -149,7 +149,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 By default, set `GEMMA_MOCK_MODE=true` so you can build and test the full app without any model running. When ready for real AI output:
 
 ```bash
-ollama pull gemma4:4b     # match this tag to GEMMA_MODEL in .env
+ollama pull gemma4:e4b     # match this tag to GEMMA_MODEL in .env
 ollama serve               # starts inference server on :11434
 ```
 
@@ -162,7 +162,7 @@ GEMMA_MOCK_MODE=false
 Restart the backend (`npm run dev`). Confirm it picked up the live model — the startup log should show:
 
 ```
-[INFO ...] Gemma 4 inference: http://127.0.0.1:11434 (model: gemma4:4b)
+[INFO ...] Gemma 4 inference: http://127.0.0.1:11434 (model: gemma4:e4b)
 ```
 
 ---

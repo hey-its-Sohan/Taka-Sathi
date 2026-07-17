@@ -51,12 +51,21 @@ async function parseTransactionText(text) {
   }
 }
 
+function convertBanglaDigitsToEnglish(str) {
+  const banglaDigits = {
+    '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+    '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+  };
+  return str.replace(/[০-৯]/g, (char) => banglaDigits[char]);
+}
+
 /**
  * Last-resort fallback if Gemma 4 is unreachable — a naive regex parse so
  * the app degrades gracefully rather than blocking data entry entirely.
  */
 function heuristicFallbackParse(text) {
-  const amountMatch = text.match(/(\d+(?:[.,]\d+)?)/);
+  const normalizedText = convertBanglaDigitsToEnglish(text);
+  const amountMatch = normalizedText.match(/(\d+(?:[.,]\d+)?)/);
   const amount = amountMatch ? parseFloat(amountMatch[1].replace(',', '')) : 0;
   const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|bought|paid|expense|spent/i;
   const isExpense = expenseKeywords.test(text);

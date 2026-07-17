@@ -71,7 +71,7 @@ cp .env.example .env
 
 ```bash
 # Install Ollama: https://ollama.com/download
-ollama pull gemma4:4b        # or whichever Gemma 4 tag is available in your Ollama version
+ollama pull gemma4:e4b        # or whichever Gemma 4 tag is available in your Ollama version
 ollama serve                 # starts the inference server on http://127.0.0.1:11434
 ```
 

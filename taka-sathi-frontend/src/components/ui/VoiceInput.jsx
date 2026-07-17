@@ -15,6 +15,8 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
   const [transcript, setTranscript] = useState('');
   const [supported, setSupported] = useState(true);
   const recognitionRef = useRef(null);
+  const transcriptRef = useRef('');
+  const silenceTimeoutRef = useRef(null);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -25,7 +27,7 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'bn-BD';
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = true;
 
     recognition.onresult = (event) => {
@@ -33,23 +35,51 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
         .map((r) => r[0].transcript)
         .join(' ');
       setTranscript(text);
+      transcriptRef.current = text;
+
+      // Clear any existing silence timer
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+
+      // Start a new 4-second silence timer
+      silenceTimeoutRef.current = setTimeout(() => {
+        recognition.stop();
+      }, 4000);
     };
 
-    recognition.onend = () => setIsListening(false);
+    recognition.onend = () => {
+      setIsListening(false);
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+      if (transcriptRef.current.trim()) {
+        onTranscriptReady(transcriptRef.current.trim());
+        transcriptRef.current = '';
+      }
+    };
+
     recognition.onerror = () => setIsListening(false);
 
     recognitionRef.current = recognition;
-    return () => recognition.stop();
-  }, []);
+    return () => {
+      recognition.stop();
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+    };
+  }, [onTranscriptReady]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) return;
     if (isListening) {
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
       recognitionRef.current.stop();
-      setIsListening(false);
-      if (transcript.trim()) onTranscriptReady(transcript.trim());
     } else {
       setTranscript('');
+      transcriptRef.current = '';
       recognitionRef.current.start();
       setIsListening(true);
     }
