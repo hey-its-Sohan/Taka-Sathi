@@ -107,13 +107,10 @@ function computeCashflowForecast(
   const { totalIncome, totalExpense } = computeTotals(recent);
   const netOverLookback = totalIncome - totalExpense;
 
-  const actualDaysObserved = Math.max(
-    1,
-    Math.min(
-      lookbackDays,
-      Math.ceil((now - lookbackStart) / (1000 * 60 * 60 * 24)),
-    ),
-  );
+  const recentDates = recent.map((t) => new Date(t.date));
+  const oldestDate = recentDates.length > 0 ? new Date(Math.min(...recentDates)) : now;
+  const daysDiff = Math.ceil((now - oldestDate) / (1000 * 60 * 60 * 24));
+  const actualDaysObserved = Math.max(1, Math.min(lookbackDays, daysDiff));
   const avgDailyNet = netOverLookback / actualDaysObserved;
 
   const forecast = [];

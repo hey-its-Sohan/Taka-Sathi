@@ -4,22 +4,35 @@ import AppShell from '../components/layout/AppShell.jsx';
 import LoanMatchCard from '../components/ui/LoanMatchCard.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import Loader from '../components/ui/Loader.jsx';
-import { loansApi } from '../lib/api';
+import { loansApi, insightsApi } from '../lib/api';
 import useToast from '../context/useToast.js';
 
 export default function LoanEligibility() {
   const [products, setProducts] = useState([]);
   const [matches, setMatches] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingLatest, setLoadingLatest] = useState(true);
   const [checking, setChecking] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
+    // Load products
     loansApi
       .getProducts()
       .then(setProducts)
       .catch((err) => toast.error(err.message))
       .finally(() => setLoadingProducts(false));
+
+    // Load latest matches from snapshot if any
+    insightsApi
+      .getLatest('weekly')
+      .then((snapshot) => {
+        if (snapshot && snapshot.loanMatches && snapshot.loanMatches.length > 0) {
+          setMatches(snapshot.loanMatches);
+        }
+      })
+      .catch((err) => console.log('No existing snapshot or error:', err.message))
+      .finally(() => setLoadingLatest(false));
   }, [toast]);
 
   const handleCheck = async () => {
@@ -68,7 +81,7 @@ export default function LoanEligibility() {
             <LoanMatchCard key={m.loanProductId} match={m} />
           ))}
         </div>
-      ) : loadingProducts ? (
+      ) : (loadingProducts || loadingLatest) ? (
         <Loader label="Loading loan products…" />
       ) : products.length === 0 ? (
         <EmptyState icon={Landmark} title="No loan products available" />

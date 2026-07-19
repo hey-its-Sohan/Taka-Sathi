@@ -33,7 +33,7 @@ export default function CashflowChart({ forecast = [] }) {
             tick={{ fontSize: 11, fill: '#6B7280' }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={(v) => `৳${Math.round(v / 1000)}k`}
+            tickFormatter={(v) => v >= 1000 || v <= -1000 ? `৳${Math.round(v / 1000)}k` : `৳${v}`}
             width={44}
           />
           <Tooltip

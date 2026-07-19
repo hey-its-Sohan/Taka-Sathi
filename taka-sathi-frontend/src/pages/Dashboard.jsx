@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   TrendingUp,
@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const hasAttemptedAutoGenerate = useRef(false);
 
   const loadOverview = useCallback(async () => {
     try {
@@ -45,7 +46,7 @@ export default function Dashboard() {
     loadOverview();
   }, [loadOverview]);
 
-  const handleGenerateSummary = async () => {
+  const handleGenerateSummary = useCallback(async () => {
     setGenerating(true);
     try {
       await insightsApi.generateSummary('weekly');
@@ -56,7 +57,20 @@ export default function Dashboard() {
     } finally {
       setGenerating(false);
     }
-  };
+  }, [loadOverview, toast]);
+
+  useEffect(() => {
+    if (
+      overview &&
+      !overview.snapshot &&
+      overview.recentTransactions?.length > 0 &&
+      !generating &&
+      !hasAttemptedAutoGenerate.current
+    ) {
+      hasAttemptedAutoGenerate.current = true;
+      handleGenerateSummary();
+    }
+  }, [overview, generating, handleGenerateSummary]);
 
   if (loading) {
     return (

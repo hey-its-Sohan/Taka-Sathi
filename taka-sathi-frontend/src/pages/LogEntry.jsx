@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Mic, Keyboard, CheckCircle2, Loader2 } from 'lucide-react';
 import AppShell from '../components/layout/AppShell.jsx';
 import VoiceInput from '../components/ui/VoiceInput.jsx';
@@ -13,7 +13,7 @@ export default function LogEntry() {
   const [lastSaved, setLastSaved] = useState(null);
   const toast = useToast();
 
-  const handleVoiceTranscript = async (rawInputText) => {
+  const handleVoiceTranscript = useCallback(async (rawInputText) => {
     setSubmitting(true);
     try {
       const transaction = await transactionsApi.create({ rawInputText, source: 'voice' });
@@ -24,9 +24,9 @@ export default function LogEntry() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [toast]);
 
-  const handleManualSubmit = async (payload) => {
+  const handleManualSubmit = useCallback(async (payload) => {
     setSubmitting(true);
     try {
       const transaction = await transactionsApi.create(payload);
@@ -37,7 +37,7 @@ export default function LogEntry() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [toast]);
 
   return (
     <AppShell title="Log Entry">
