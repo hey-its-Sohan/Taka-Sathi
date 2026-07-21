@@ -9,7 +9,7 @@ export const tokenStore = {
   clear: () => localStorage.removeItem(TOKEN_KEY),
 };
 
-const http = axios.create({ baseURL: BASE_URL, timeout: 100000 });
+const http = axios.create({ baseURL: BASE_URL, timeout: 300000 });
 
 http.interceptors.request.use((config) => {
   const token = tokenStore.get();

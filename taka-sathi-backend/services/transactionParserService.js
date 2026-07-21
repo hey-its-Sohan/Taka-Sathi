@@ -34,18 +34,24 @@ async function parseTransactionText(text) {
           return { status: 'received' };
         },
       },
-      2
+      2,
+      gemmaConfig.parserTimeoutMs
     );
 
-    if (parsed && typeof parsed.amount === 'number') {
+    if (parsed && typeof parsed.amount === 'number' && parsed.amount > 0) {
+      let type = parsed.type;
+      if (type !== 'expense' && type !== 'income') {
+        const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|bought|paid|expense|spent/i;
+        type = expenseKeywords.test(text) ? 'expense' : 'income';
+      }
       return {
         amount: Math.abs(parsed.amount),
-        type: parsed.type === 'expense' ? 'expense' : 'income',
+        type,
         category: parsed.category || 'other',
         note: parsed.note || text,
       };
     }
-    throw new Error('Model did not return a valid parsed transaction');
+    throw new Error('Model did not return a valid parsed transaction with amount > 0');
   } catch (err) {
     return heuristicFallbackParse(text);
   }
@@ -67,6 +73,11 @@ function heuristicFallbackParse(text) {
   const normalizedText = convertBanglaDigitsToEnglish(text);
   const amountMatch = normalizedText.match(/(\d+(?:[.,]\d+)?)/);
   const amount = amountMatch ? parseFloat(amountMatch[1].replace(',', '')) : 0;
+
+  if (amount <= 0) {
+    throw new Error('Transaction amount must be greater than zero');
+  }
+
   const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|bought|paid|expense|spent/i;
   const isExpense = expenseKeywords.test(text);
 

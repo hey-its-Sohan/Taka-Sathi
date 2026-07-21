@@ -152,17 +152,38 @@ function computeDaysWithEntries(transactions) {
  * the loan eligibility engine.
  */
 function computeAvgMonthlyRevenue(transactions, monthsLookback = 3) {
+  if (!transactions || transactions.length === 0) {
+    return 0;
+  }
+
   const now = new Date();
   const start = new Date(now);
   start.setMonth(now.getMonth() - monthsLookback);
 
+  // Filter for income transactions in the lookback window
   const recent = transactions.filter(
     (t) => t.type === "income" && new Date(t.date) >= start,
   );
   const totalIncome = recent.reduce((sum, t) => sum + t.amount, 0);
 
-  const monthsElapsed = Math.max(1, monthsLookback);
-  return Math.round(totalIncome / monthsElapsed);
+  // Find earliest transaction overall
+  const txnDates = transactions.map((t) => new Date(t.date));
+  const earliestDate = new Date(Math.min(...txnDates));
+
+  // Days elapsed since the earliest transaction
+  const diffTime = Math.abs(now - earliestDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  // Cap at the lookback window in days (approx 30 days per month)
+  const maxDaysInLookback = monthsLookback * 30;
+  const daysObserved = Math.min(maxDaysInLookback, diffDays);
+
+  // Floor at 7 days minimum to avoid outliers
+  const finalDays = Math.max(7, daysObserved);
+
+  // Calculate actual daily rate and scale to 30 days
+  const dailyIncomeRate = totalIncome / finalDays;
+  return Math.round(dailyIncomeRate * 30);
 }
 
 module.exports = {

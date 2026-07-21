@@ -26,7 +26,7 @@ const http = axios.create({
  * @param {Array} [tools] - OpenAI-style tool/function definitions
  * @returns {Object} raw assistant message object { role, content, tool_calls? }
  */
-async function chatCompletion(messages, tools = null) {
+async function chatCompletion(messages, tools = null, customTimeout = null) {
   if (gemmaConfig.mockMode) {
     return mockChatCompletion(messages, tools);
   }
@@ -42,7 +42,12 @@ async function chatCompletion(messages, tools = null) {
       payload.tools = tools;
     }
 
-    const { data } = await http.post("/v1/chat/completions", payload);
+    const config = {};
+    if (customTimeout) {
+      config.timeout = customTimeout;
+    }
+
+    const { data } = await http.post("/v1/chat/completions", payload, config);
     const choice = data.choices && data.choices[0];
     if (!choice) {
       throw new Error("Gemma 4 returned no choices in response");
@@ -75,11 +80,12 @@ async function runWithTools(
   toolDefinitions,
   toolHandlers,
   maxIterations = 4,
+  customTimeout = null,
 ) {
   let messages = [...initialMessages];
 
   for (let i = 0; i < maxIterations; i++) {
-    const assistantMessage = await chatCompletion(messages, toolDefinitions);
+    const assistantMessage = await chatCompletion(messages, toolDefinitions, customTimeout);
 
     const toolCalls = assistantMessage.tool_calls;
     if (!toolCalls || toolCalls.length === 0) {
@@ -135,12 +141,12 @@ async function runWithTools(
  * once all numbers are already computed deterministically and just need
  * to be turned into plain-Bangla prose.
  */
-async function generateText(userPrompt, { systemPrompt } = {}) {
+async function generateText(userPrompt, { systemPrompt, timeout } = {}) {
   const messages = [
     { role: "system", content: systemPrompt || gemmaConfig.systemPrompt },
     { role: "user", content: userPrompt },
   ];
-  const message = await chatCompletion(messages);
+  const message = await chatCompletion(messages, null, timeout);
   return message.content || "";
 }
 

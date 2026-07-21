@@ -1,6 +1,7 @@
 const financeEngine = require("./financeEngine");
 const gemmaService = require("./gemmaService");
 const Transaction = require("../models/Transaction");
+const gemmaConfig = require("../config/gemmaConfig");
 
 const PERIOD_DAYS = { daily: 1, weekly: 7, monthly: 30 };
 
@@ -18,6 +19,7 @@ async function generateFinancialSummary(userId, periodType, language = "bn") {
   const days = PERIOD_DAYS[periodType] || 7;
   const now = new Date();
   const periodStart = new Date(now);
+  periodStart.setHours(0, 0, 0, 0); // Anchor to midnight (start of day)
   periodStart.setDate(now.getDate() - days);
 
   const previousStart = new Date(periodStart);
@@ -116,7 +118,7 @@ Respond ONLY with a JSON object (no markdown, no extra text) in this exact shape
   "warningMessage": "${cashflow.willGoNegative ? `1-2 sentence urgent but constructive warning that cash flow may go negative around ${cashflow.negativeOnDate}, with one concrete suggestion, in ${language === "bn" ? "plain Bangla" : "plain English"}` : "empty string since there is no warning"}"
 }`;
 
-  const raw = await gemmaService.generateText(prompt);
+  const raw = await gemmaService.generateText(prompt, { timeout: gemmaConfig.summaryTimeoutMs });
   return safeParseJsonResponse(raw, {
     summaryText:
       current.netProfit >= 0
