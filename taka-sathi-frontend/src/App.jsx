@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import LogEntry from './pages/LogEntry.jsx';
 import History from './pages/History.jsx';
 import LoanEligibility from './pages/LoanEligibility.jsx';
+import VoiceAuthPage from './pages/VoiceAuthPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 function RootRedirect() {
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/log-entry" element={<LogEntry />} />
           <Route path="/history" element={<History />} />
           <Route path="/loans" element={<LoanEligibility />} />
+          <Route path="/voice-auth" element={<VoiceAuthPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

@@ -15,12 +15,17 @@ export default function TransactionItem({ transaction, onEdit, onDelete }) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <p className="font-medium text-sm text-neutral truncate">
             {categoryLabel(transaction.category)}
           </p>
           {transaction.source === 'voice' && (
             <Mic size={12} className="text-base-content/30 shrink-0" />
+          )}
+          {transaction.creatorName && (
+            <span className="badge badge-outline border-teal-500/35 text-teal-700 text-[9px] px-1.5 py-0.5 h-auto rounded font-semibold font-bn">
+              ভয়েস: {transaction.creatorName}
+            </span>
           )}
         </div>
         <p className="text-xs text-base-content/45 truncate">

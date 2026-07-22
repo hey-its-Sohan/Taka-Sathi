@@ -1,16 +1,62 @@
 const asyncHandler = require('express-async-handler');
 const Transaction = require('../models/Transaction');
+const User = require('../models/User');
+const voiceVerificationService = require('../services/voiceVerificationService');
 const transactionParserService = require('../services/transactionParserService');
 const { success, ApiError } = require('../utils/apiResponse');
 
 /**
  * POST /api/transactions
  * Body EITHER:
- *   { rawInputText, source: 'voice' }        -> parsed via Gemma 4
- *   { amount, type, category, note }          -> manual entry, no AI call needed
+ *   { rawInputText, source: 'voice', audioData, duration } -> parsed via Gemma 4
+ *   { amount, type, category, note }                      -> manual entry, no AI call needed
  */
 const addTransaction = asyncHandler(async (req, res) => {
-  const { amount, type, category, note, rawInputText, source, date } = req.body;
+  const { amount, type, category, note, rawInputText, source, date, audioData, duration } = req.body;
+
+  let activeStaffInfo = {};
+
+  // If Shift Safe Voice is enabled and input is from voice, perform speaker verification
+  if (source === 'voice' && req.user.isSafeVoiceEnabled) {
+    if (!audioData) {
+      throw new ApiError(400, 'নিরাপদ ভয়েস ভেরিফিকেশনের জন্য অডিও ডেটা প্রয়োজন।');
+    }
+
+    // Retrieve active profile with baseline audio data
+    const userWithVoice = await User.findById(req.user._id).select('+voiceProfiles.audioData');
+    if (!userWithVoice || !userWithVoice.activeVoiceProfileId) {
+      throw new ApiError(400, 'কোনো সক্রিয় স্টাফ ভয়েস প্রোফাইল সেট করা নেই।');
+    }
+
+    const activeProfile = userWithVoice.voiceProfiles.find(
+      (vp) => vp.voiceProfileId === userWithVoice.activeVoiceProfileId
+    );
+
+    if (!activeProfile || !activeProfile.audioData) {
+      throw new ApiError(400, 'সক্রিয় স্টাফ ভয়েস প্রোফাইল বা তার বেসলাইন ডেটা পাওয়া যায়নি।');
+    }
+
+    // Perform 1:1 match verification against active staff profile
+    const verification = voiceVerificationService.verifyVoice(
+      audioData,
+      activeProfile.audioData,
+      duration || 3,
+      activeProfile.duration || 5
+    );
+
+    if (!verification.success) {
+      throw new ApiError(
+        403,
+        `ভয়েস মেলেনি: লেনদেনটি শুধুমাত্র বর্তমানে সক্রিয় স্টাফ (${activeProfile.name}) রেজিস্টার করতে পারবেন।`
+      );
+    }
+
+    // Capture staff details for audit trail logging
+    activeStaffInfo = {
+      voiceProfileId: activeProfile.voiceProfileId,
+      creatorName: activeProfile.name
+    };
+  }
 
   let transactionData;
 
@@ -40,6 +86,7 @@ const addTransaction = asyncHandler(async (req, res) => {
   const transaction = await Transaction.create({
     userId: req.user._id,
     ...transactionData,
+    ...activeStaffInfo,
     date: date ? new Date(date) : new Date(),
   });
 

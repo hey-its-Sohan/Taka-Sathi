@@ -4,6 +4,14 @@ const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
 const { requestOtp, verifyOtp, getMe, updateProfile } = require('../controllers/authController');
+const { 
+  enrollVoice, 
+  verifyVoice, 
+  deleteVoice,
+  enrollVoiceProfile,
+  deleteVoiceProfile,
+  updateVoiceSettings
+} = require('../controllers/voiceAuthController');
 const { protect } = require('../middleware/authMiddleware');
 const validateRequest = require('../middleware/validateRequest');
 
@@ -33,5 +41,15 @@ router.post(
 
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
+
+// Voice Lock/Password Endpoints
+router.post('/voice/enroll', protect, enrollVoice);
+router.post('/voice/verify', protect, verifyVoice);
+router.delete('/voice', protect, deleteVoice);
+
+// Shift-Based Safe Voice Mode Endpoints
+router.post('/voice-profiles/enroll', protect, enrollVoiceProfile);
+router.delete('/voice-profiles/:id', protect, deleteVoiceProfile);
+router.put('/voice-profiles/settings', protect, updateVoiceSettings);
 
 module.exports = router;

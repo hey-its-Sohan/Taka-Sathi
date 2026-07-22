@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Mic, History, Landmark, LogOut, Menu, Wallet } from 'lucide-react';
+import { LayoutDashboard, Mic, History, Landmark, LogOut, Menu, Wallet, Shield } from 'lucide-react';
 import useAuth from '../../context/useAuth.js';
 
 const NAV_ITEMS = [
@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/log-entry', label: 'Log Entry', icon: Mic },
   { to: '/history', label: 'History', icon: History },
   { to: '/loans', label: 'Loan Eligibility', icon: Landmark },
+  { to: '/voice-auth', label: 'Avoid Crowds', icon: Shield },
 ];
 
 function SidebarContent({ onNavigate }) {

@@ -73,4 +73,14 @@ export const dashboardApi = {
   getOverview: () => http.get('/dashboard/overview'),
 };
 
+/* ---------------------------- Voice ------------------------------ */
+export const voiceApi = {
+  enroll: (audioData, duration, mimeType) => http.post('/auth/voice/enroll', { audioData, duration, mimeType }),
+  verify: (audioData, duration) => http.post('/auth/voice/verify', { audioData, duration }),
+  delete: () => http.delete('/auth/voice'),
+  enrollProfile: (name, audioData, duration, mimeType) => http.post('/auth/voice-profiles/enroll', { name, audioData, duration, mimeType }),
+  deleteProfile: (id) => http.delete(`/auth/voice-profiles/${id}`),
+  updateSettings: (isSafeVoiceEnabled, activeVoiceProfileId) => http.put('/auth/voice-profiles/settings', { isSafeVoiceEnabled, activeVoiceProfileId }),
+};
+
 export default http;

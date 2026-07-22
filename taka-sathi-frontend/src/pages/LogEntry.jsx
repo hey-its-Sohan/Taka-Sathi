@@ -13,10 +13,15 @@ export default function LogEntry() {
   const [lastSaved, setLastSaved] = useState(null);
   const toast = useToast();
 
-  const handleVoiceTranscript = useCallback(async (rawInputText) => {
+  const handleVoiceTranscript = useCallback(async (rawInputText, audioDetails = null) => {
     setSubmitting(true);
     try {
-      const transaction = await transactionsApi.create({ rawInputText, source: 'voice' });
+      const payload = { 
+        rawInputText, 
+        source: 'voice',
+        ...(audioDetails || {})
+      };
+      const transaction = await transactionsApi.create(payload);
       setLastSaved(transaction);
       toast.success('Transaction saved — parsed by Gemma 4');
     } catch (err) {

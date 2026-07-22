@@ -46,6 +46,34 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // --- Voice Password fields ---
+    voicePrint: {
+      audioData: { type: String, select: false }, // Base64 audio string
+      duration: { type: Number },
+      mimeType: { type: String },
+      enrolledAt: { type: Date },
+    },
+    voiceEnrolled: {
+      type: Boolean,
+      default: false,
+    },
+    // --- Shift-Based Safe Voice Mode fields ---
+    voiceProfiles: [{
+      name: { type: String, required: true },
+      voiceProfileId: { type: String, required: true },
+      audioData: { type: String, select: false }, // Base64 voice profile audio print
+      duration: { type: Number },
+      mimeType: { type: String },
+      enrolledAt: { type: Date, default: Date.now }
+    }],
+    isSafeVoiceEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    activeVoiceProfileId: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

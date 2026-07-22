@@ -54,6 +54,14 @@ const transactionSchema = new mongoose.Schema(
       required: true,
       default: Date.now,
     },
+    voiceProfileId: {
+      type: String,
+      default: null,
+    },
+    creatorName: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

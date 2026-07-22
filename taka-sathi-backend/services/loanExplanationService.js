@@ -1,4 +1,5 @@
 const gemmaService = require('./gemmaService');
+const logger = require('../utils/logger');
 
 /**
  * Takes the deterministic output of loanEligibilityEngine.matchLoanProducts
@@ -33,8 +34,13 @@ ${JSON.stringify(compactMatches, null, 2)}
 Respond ONLY with a JSON array (no markdown), same length and order as the input, in this shape:
 [{ "idx": 0, "reason": "..." }, ...]`;
 
-  const raw = await gemmaService.generateText(prompt);
-  const explanations = safeParseJsonArray(raw);
+  let explanations = [];
+  try {
+    const raw = await gemmaService.generateText(prompt);
+    explanations = safeParseJsonArray(raw);
+  } catch (err) {
+    logger.warn(`Gemma 4 inference failed/timed out in explainLoanMatches, falling back to local explanations: ${err.message}`);
+  }
 
   return matches.map((match, idx) => {
     const found = explanations.find((e) => e.idx === idx);
