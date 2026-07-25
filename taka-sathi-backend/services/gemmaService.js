@@ -166,13 +166,19 @@ function mockChatCompletion(messages, tools) {
   const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
   const text = lastUserMsg?.content || "";
 
+  // Convert Bengali numerals to Western digits for robust regex matching in Mock Mode
+  const cleanText = text.replace(/[০-৯]/g, (w) => {
+    const banglaDigits = {'০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'};
+    return banglaDigits[w];
+  });
+
   // If tools were offered and this looks like a transaction-parsing prompt,
   // simulate a tool call so the parse_transaction flow is still exercisable.
   if (
     tools &&
     tools.some((t) => t.function?.name === "return_parsed_transaction")
   ) {
-    const amountMatch = text.match(/(\d+)/);
+    const amountMatch = cleanText.match(/(\d+)/);
     const amount = amountMatch ? parseInt(amountMatch[1], 10) : 500;
     const isExpense = /কিনলাম|খরচ|expense|bought|paid/i.test(text);
     return {
