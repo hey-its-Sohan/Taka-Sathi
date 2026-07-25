@@ -24,20 +24,47 @@ Each folder has its own `README.md` with deeper detail — this file covers the 
 
 ```
 [Vendor's Browser]
-       │  voice / form input
-       ▼
+  ├── Web Speech API (Transcription)
+  └── Web Audio API (Noise Monitoring)
+                     │
+                     ▼
 [React Frontend — Vite]  ──REST API (JWT)──▶  [Express Backend — MVC]
   taka-sathi-frontend                              taka-sathi-backend
                                                           │
-                                    ┌─────────────────────┼─────────────────────┐
-                                    ▼                     ▼                     ▼
-                             [MongoDB]          [Deterministic Finance    [Gemma 4 via Ollama]
-                          Users, Transactions,    Engine — cash flow,      structures voice input
-                          LoanProducts,           health score,           & explains results in
-                          FinancialSnapshots      loan rule matching]      plain Bangla
+                    ┌─────────────────────────────────────┼─────────────────────────────────────┐
+                    ▼                                     ▼                                     ▼
+             [MongoDB Atlas]                   [Deterministic Finance            [Gemma 4 via Ollama]
+          Users, Transactions,                 & Voice Verification Engine]      structures voice input
+          Voice Profiles                       (shift cashier validation         & explains results in
+                                                via 1:1 acoustic vectors)        plain Bangla
 ```
 
 **Core design principle:** Gemma 4 never computes financial numbers. All arithmetic (totals, health score, cash-flow forecast, loan eligibility) is deterministic JavaScript. Gemma 4's only job is to _structure_ free-text/voice input and _explain_ already-computed numbers in plain Bangla — see `taka-sathi-backend/README.md` §8 for the full rationale.
+
+**Key Architectural Components:**
+- **Speech Capture & Noise Monitoring (Frontend):** Uses browser Web Speech API for live transcription, and Web Audio API (`AnalyserNode`) to continuously monitor decibel levels to flag high crowd noise.
+- **Biometric Voice Lock & Shift Security (Backend):** When a transaction is logged in "Avoid Crowd Mode," the backend verifies the cashier's voice print using 1:1 acoustic energy vector angle comparison. If matched, the user ID is logged to the transaction audit trail; otherwise, the request is rejected (403).
+- **Locally-Hosted LLM Parsing (Ollama):** Forwarded transcripts are parsed by a local Ollama server running Gemma 4 (`gemma4:e4b`) to guarantee data privacy and offline capability for small shops.
+
+---
+
+## Key Feature Updates (Hackathon Additions)
+
+We have recently integrated several high-performance UX and security enhancements:
+
+1. **Three-Way UI Language Switching:**
+   - Adds a global language toggle group scale-aligned to the top header.
+   - **Default**: Preserves original mixed English/Bengali layout.
+   - **বাং (Bengali)**: Translates all headers, menus, and transaction cards to full Bengali.
+   - **EN (English)**: Translates voice lock prompts, alerts, and instructions into clean English.
+2. **Performance-First Crowd Auto-Detect:**
+   - Integrates ambient noise level monitoring using browser `Web Audio API` (`AudioContext` and `AnalyserNode`).
+   - Downsamples frequency analytics (once every 1500ms) to save battery and CPU power on mobile webviews.
+   - Tracks consecutive speech recognition transcription failures; automatically prompts the user to activate "Avoid Crowd Mode" after 2 failures.
+   - Suspends the microphone/analyser context automatically when the browser tab is hidden using the Page Visibility API.
+3. **Enhanced Voice Passphrase & Matching Threshold:**
+   - Expanded voice lock passphrase into a richer sentence (*"আমি নিশ্চিত করছি যে টাকাসাথী অ্যাপে আমার কণ্ঠস্বরই আমার আসল পরিচয় এবং এর মাধ্যমে আমার সকল আর্থিক লেনদেন সুরক্ষিত ও নিরাপদ রাখছি।"*) for a larger speech entropy print.
+   - Standardized speaker verification matching threshold back to `0.75` (75%) for high-security constraints.
 
 ---
 
