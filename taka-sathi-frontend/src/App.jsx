@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ToastProvider from './context/ToastContext.jsx';
+import LanguageProvider from './context/LanguageContext.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import useAuth from './context/useAuth.js';
 import Loader from './components/ui/Loader.jsx';
@@ -22,7 +23,8 @@ function RootRedirect() {
 
 export default function App() {
   return (
-    <ToastProvider>
+    <LanguageProvider>
+      <ToastProvider>
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
@@ -44,5 +46,6 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ToastProvider>
+    </LanguageProvider>
   );
 }

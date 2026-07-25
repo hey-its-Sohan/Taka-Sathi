@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Mic, History, Landmark, LogOut, Menu, Wallet, Shield } from 'lucide-react';
 import useAuth from '../../context/useAuth.js';
+import useLanguage from '../../context/useLanguage.js';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -13,6 +14,7 @@ const NAV_ITEMS = [
 function SidebarContent({ onNavigate }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleLogout = () => {
     logout();
@@ -46,7 +48,7 @@ function SidebarContent({ onNavigate }) {
             }
           >
             <Icon size={18} />
-            {label}
+            {t(label)}
           </NavLink>
         ))}
       </nav>
@@ -67,32 +69,76 @@ function SidebarContent({ onNavigate }) {
           onClick={handleLogout}
           className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-neutral-content/60 hover:bg-white/5 hover:text-white w-full mt-1 transition"
         >
-          <LogOut size={18} /> Log out
+          <LogOut size={18} /> {t('Log out')}
         </button>
       </div>
     </div>
   );
 }
 
+function LanguageToggle() {
+  const { language, setLanguage } = useLanguage();
+
+  return (
+    <div className="join bg-base-100 shadow-sm border border-base-300 rounded-xl p-0.5 scale-90 shrink-0">
+      <button
+        onClick={() => setLanguage('default')}
+        className={`btn btn-xs rounded-lg px-2 text-[10px] sm:text-[11px] font-bold ${
+          language === 'default' ? 'bg-primary text-primary-content hover:bg-primary' : 'btn-ghost text-neutral/70 hover:bg-base-200'
+        }`}
+        title="Mixed Language (System Default)"
+      >
+        Default
+      </button>
+      <button
+        onClick={() => setLanguage('bn')}
+        className={`btn btn-xs rounded-lg px-2 text-[10px] sm:text-[11px] font-bold ${
+          language === 'bn' ? 'bg-primary text-primary-content hover:bg-primary' : 'btn-ghost text-neutral/70 hover:bg-base-200'
+        }`}
+        title="Full Bangla (বাং)"
+      >
+        বাং
+      </button>
+      <button
+        onClick={() => setLanguage('en')}
+        className={`btn btn-xs rounded-lg px-2 text-[10px] sm:text-[11px] font-bold ${
+          language === 'en' ? 'bg-primary text-primary-content hover:bg-primary' : 'btn-ghost text-neutral/70 hover:bg-base-200'
+        }`}
+        title="Full English"
+      >
+        EN
+      </button>
+    </div>
+  );
+}
+
 export default function AppShell({ children, title }) {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen bg-base-200">
       <div className="drawer lg:drawer-open">
         <input id="app-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
           {/* Topbar (mobile) */}
-          <div className="lg:hidden flex items-center gap-3 bg-base-100 border-b border-base-300 px-4 py-3 sticky top-0 z-30">
-            <label htmlFor="app-drawer" className="btn btn-ghost btn-sm btn-square">
-              <Menu size={20} />
-            </label>
-            <p className="font-display font-semibold">{title || 'TakaSathi'}</p>
+          <div className="lg:hidden flex items-center justify-between bg-base-100 border-b border-base-300 px-4 py-3 sticky top-0 z-30">
+            <div className="flex items-center gap-3 min-w-0">
+              <label htmlFor="app-drawer" className="btn btn-ghost btn-sm btn-square shrink-0">
+                <Menu size={20} />
+              </label>
+              <p className="font-display font-semibold truncate">{t(title) || 'TakaSathi'}</p>
+            </div>
+            <LanguageToggle />
           </div>
 
           <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto">
             {title && (
-              <h1 className="hidden lg:block font-display text-2xl font-bold text-neutral mb-6">
-                {title}
-              </h1>
+              <div className="hidden lg:flex items-center justify-between mb-6 border-b border-base-300/40 pb-4">
+                <h1 className="font-display text-2xl font-bold text-neutral">
+                  {t(title)}
+                </h1>
+                <LanguageToggle />
+              </div>
             )}
             {children}
           </main>

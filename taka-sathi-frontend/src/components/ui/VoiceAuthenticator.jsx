@@ -7,6 +7,16 @@ import useToast from '../../context/useToast.js';
 import useAuth from '../../context/useAuth.js';
 import { voiceApi } from '../../lib/api';
 
+// Helper to convert blob to base64 data url
+const convertBlobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 export default function VoiceAuthenticator() {
   const toast = useToast();
   const { user, refreshUser } = useAuth();
@@ -53,8 +63,8 @@ export default function VoiceAuthenticator() {
 
   // Enrollment Prompt sentence
   const ENROLL_PROMPTS = {
-    bn: "টাকাসাথী অ্যাপে আমার কণ্ঠস্বর নিরাপত্তা নিশ্চিত করছে এবং লেনদেন নিরাপদ রাখছে।",
-    en: "My voice is my secure password on TakaSathi, validating my identity."
+    bn: "আমি নিশ্চিত করছি যে টাকাসাথী অ্যাপে আমার কণ্ঠস্বরই আমার আসল পরিচয় এবং এর মাধ্যমে আমার সকল আর্থিক লেনদেন সুরক্ষিত ও নিরাপদ রাখছি।",
+    en: "I verify that my voice is my unique identity on the TakaSathi app, keeping all my financial transactions fully secure and protected."
   };
   const [selectedLang, setSelectedLang] = useState('bn');
 

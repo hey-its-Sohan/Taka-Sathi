@@ -23,10 +23,13 @@ http.interceptors.response.use(
   (res) => res.data?.data,
   (err) => {
     if (err.response?.status === 401) {
-      tokenStore.clear();
-      // Hard redirect rather than router push — keeps this file router-agnostic
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login';
+      const isVoiceVerify = err.config?.url?.includes('/auth/voice/verify');
+      if (!isVoiceVerify) {
+        tokenStore.clear();
+        // Hard redirect rather than router push — keeps this file router-agnostic
+        if (!window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
       }
     }
     const message =

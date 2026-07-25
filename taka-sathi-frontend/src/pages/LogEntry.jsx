@@ -6,12 +6,14 @@ import TransactionForm from '../components/ui/TransactionForm.jsx';
 import { transactionsApi } from '../lib/api';
 import { formatTaka, categoryLabel } from '../lib/format';
 import useToast from '../context/useToast.js';
+import useLanguage from '../context/useLanguage.js';
 
 export default function LogEntry() {
   const [mode, setMode] = useState('voice'); // 'voice' | 'manual'
   const [submitting, setSubmitting] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
   const toast = useToast();
+  const { t } = useLanguage();
 
   const handleVoiceTranscript = useCallback(async (rawInputText, audioDetails = null) => {
     setSubmitting(true);
@@ -52,13 +54,13 @@ export default function LogEntry() {
             onClick={() => setMode('voice')}
             className={`tab flex-1 gap-2 rounded-xl ${mode === 'voice' ? 'tab-active bg-taka-gradient text-primary-content' : ''}`}
           >
-            <Mic size={15} /> Voice
+            <Mic size={15} /> {t('Voice')}
           </button>
           <button
             onClick={() => setMode('manual')}
             className={`tab flex-1 gap-2 rounded-xl ${mode === 'manual' ? 'tab-active bg-taka-gradient text-primary-content' : ''}`}
           >
-            <Keyboard size={15} /> Manual
+            <Keyboard size={15} /> {t('Manual')}
           </button>
         </div>
 
@@ -72,7 +74,7 @@ export default function LogEntry() {
 
         {submitting && mode === 'voice' && (
           <div className="flex items-center justify-center gap-2 text-sm text-base-content/50 mt-4">
-            <Loader2 size={14} className="animate-spin" /> Gemma 4 is structuring your entry…
+            <Loader2 size={14} className="animate-spin" /> {t('Gemma 4 is structuring your entry…')}
           </div>
         )}
 

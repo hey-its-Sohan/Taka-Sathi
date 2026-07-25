@@ -94,9 +94,12 @@ class VoiceVerificationService {
   _decodeBase64(base64String) {
     if (!base64String) return null;
     
-    // Strip data URI scheme if present (e.g., "data:audio/webm;base64,...")
-    const matches = base64String.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
-    const cleanBase64 = matches ? matches[2] : base64String;
+    let cleanBase64 = base64String;
+    if (base64String.includes(';base64,')) {
+      cleanBase64 = base64String.split(';base64,')[1];
+    } else if (base64String.includes(',')) {
+      cleanBase64 = base64String.split(',')[1];
+    }
     
     return Buffer.from(cleanBase64, 'base64');
   }

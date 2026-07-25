@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, AlertCircle, ShieldAlert, ShieldCheck, Lock } from 'lucide-react';
 import useAuth from '../../context/useAuth.js';
+import useToast from '../../context/useToast.js';
+import useNoiseDetection from '../../hooks/useNoiseDetection.js';
+import { voiceApi } from '../../lib/api';
+import useLanguage from '../../context/useLanguage.js';
 
 /**
  * Voice-first transaction entry with shift-based speaker verification capability.
@@ -9,8 +13,10 @@ import useAuth from '../../context/useAuth.js';
  * to allow 1:1 speaker verification on the backend.
  */
 export default function VoiceInput({ onTranscriptReady, disabled }) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const isSafeMode = user?.isSafeVoiceEnabled || false;
+  const toast = useToast();
+  const { t } = useLanguage();
 
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -24,6 +30,43 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
   const transcriptRef = useRef('');
   const silenceTimeoutRef = useRef(null);
   const startTimeRef = useRef(0);
+
+  const {
+    recordTranscriptionSuccess,
+    recordTranscriptionFailure,
+  } = useNoiseDetection({
+    volumeThreshold: -35,
+    durationThreshold: 5000, // 5 seconds of loud ambient noise
+    consecutiveFailuresLimit: 2,
+    cooldownTime: 300000, // 5 minutes cooldown
+    enabled: !isSafeMode,
+    onCrowdDetected: () => {
+      toast.info(
+        t("দোকানে কি ভিড় বেড়েছে? সঠিক হিসাব রাখতে 'Avoid Crowd Mode' চালু করুন।"),
+        {
+          type: 'custom',
+          duration: 10000,
+          action: {
+            label: t('Turn ON'),
+            onClick: async () => {
+              if (!user?.voiceProfiles || user.voiceProfiles.length === 0) {
+                toast.error(t('আগে কমপক্ষে ১টি স্টাফ ভয়েস প্রোফাইল যুক্ত করুন।'));
+                return;
+              }
+              try {
+                const activeProfileId = user.activeVoiceProfileId || user.voiceProfiles[0]?.voiceProfileId;
+                await voiceApi.updateSettings(true, activeProfileId);
+                toast.success(t('শিফট নিরাপদ ভয়েস মোড (Avoid Crowd Mode) চালু করা হয়েছে।'));
+                refreshUser();
+              } catch (err) {
+                toast.error(err.message || t('সেটিংস আপডেট করা যায়নি।'));
+              }
+            },
+          },
+        }
+      );
+    },
+  });
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -129,6 +172,7 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
 
         const finalTranscript = transcriptRef.current.trim();
         if (finalTranscript) {
+          recordTranscriptionSuccess();
           try {
             // Encode baseline audio payload to verify on server
             const base64Audio = await convertBlobToBase64(blob);
@@ -140,6 +184,8 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
             console.error('Failed to convert speech blob to Base64:', err);
             onTranscriptReady(finalTranscript, null);
           }
+        } else {
+          recordTranscriptionFailure();
         }
         transcriptRef.current = '';
       };
@@ -230,17 +276,17 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
 
       <div className="flex flex-col items-center gap-1">
         <p className="text-sm text-base-content/60 text-center max-w-xs font-semibold">
-          {isListening ? 'শুনছি… কথা বলুন' : 'আজকের বিক্রি বা খরচ বলুন'}
+          {isListening ? t('শুনছি… কথা বলুন') : t('আজকের বিক্রি বা খরচ বলুন')}
         </p>
         
         {/* Subtitle status badges */}
         {isSafeMode ? (
           <span className="badge badge-sm bg-teal-500/10 text-teal-700 border-none font-bold text-[10px] flex gap-1 py-1 px-2.5 rounded-md">
-            <ShieldCheck size={11} /> নিরাপদ শিফট মোড অন
+            <ShieldCheck size={11} /> {t('নিরাপদ শিফট মোড অন')}
           </span>
         ) : (
           <span className="text-[10px] text-base-content/40">
-            স্ট্যান্ডার্ড মোড (যে কেউ কমান্ড দিতে পারবেন)
+            {t('স্ট্যান্ডার্ড মোড (যে কেউ কমান্ড দিতে পারবেন)')}
           </span>
         )}
       </div>

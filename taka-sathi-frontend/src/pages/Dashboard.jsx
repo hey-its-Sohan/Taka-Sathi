@@ -22,10 +22,12 @@ import { dashboardApi, insightsApi } from '../lib/api';
 import { formatTaka, categoryLabel } from '../lib/format';
 import useAuth from '../context/useAuth.js';
 import useToast from '../context/useToast.js';
+import useLanguage from '../context/useLanguage.js';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const toast = useToast();
+  const { t, language } = useLanguage();
   const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -88,18 +90,18 @@ export default function Dashboard() {
       {/* Mobile greeting (desktop title shown by AppShell) */}
       <div className="lg:hidden mb-4">
         <h2 className="font-display text-xl font-bold text-neutral">
-          Hi, {user?.name?.split(' ')[0] || 'there'} 👋
+          {t('Hi')}, {user?.name?.split(' ')[0] || 'there'} 👋
         </h2>
       </div>
 
       {!hasData && (
         <EmptyState
           icon={Mic}
-          title="No transactions logged yet"
-          description="Start by logging your first sale or expense — by voice or a quick form."
+          title={t('No transactions logged yet')}
+          description={t('Start by logging your first sale or expense — by voice or a quick form.')}
           action={
             <Link to="/log-entry" className="btn-brand btn btn-sm gap-2 mt-2">
-              <Mic size={15} /> Log your first entry
+              <Mic size={15} /> {t('Log your first entry')}
             </Link>
           }
         />
@@ -111,7 +113,7 @@ export default function Dashboard() {
             <div className="alert bg-error/10 border border-error/20 text-error rounded-2xl mb-6 items-start">
               <AlertTriangle size={18} className="mt-0.5 shrink-0" />
               <div>
-                <p className="font-semibold text-sm">Cash-flow warning</p>
+                <p className="font-semibold text-sm">{t('Cash-flow warning')}</p>
                 <p className="font-bn text-sm mt-0.5 opacity-90">{snapshot.warningMessage}</p>
               </div>
             </div>
@@ -121,7 +123,7 @@ export default function Dashboard() {
             {/* Health score */}
             <div className="card-surface p-6 flex flex-col items-center justify-center">
               <p className="text-xs font-medium text-base-content/50 uppercase tracking-wide mb-3 self-start">
-                Financial Health Score
+                {t('Financial Health Score')}
               </p>
               <HealthScoreGauge score={snapshot?.healthScore || 0} />
               {snapshot?.healthScoreExplanation && (
@@ -136,19 +138,19 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <StatCard
                   icon={TrendingUp}
-                  label="Income"
+                  label={t('Income')}
                   value={formatTaka(snapshot?.totalIncome || 0)}
                   tone="success"
                 />
                 <StatCard
                   icon={TrendingDown}
-                  label="Expense"
+                  label={t('Expense')}
                   value={formatTaka(snapshot?.totalExpense || 0)}
                   tone="error"
                 />
                 <StatCard
                   icon={Wallet}
-                  label="Net Profit"
+                  label={t('Net Profit')}
                   value={formatTaka(snapshot?.netProfit || 0)}
                   tone="gold"
                 />
@@ -157,7 +159,7 @@ export default function Dashboard() {
               <div className="card-surface p-5">
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-display font-semibold text-neutral text-sm">
-                    7-Day Cash-Flow Forecast
+                    {t('7-Day Cash-Flow Forecast')}
                   </p>
                 </div>
                 <CashflowChart forecast={snapshot?.cashflowForecast || []} />
@@ -173,10 +175,10 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="font-display font-semibold text-white text-sm">
-                  Refresh your Gemma 4 financial summary
+                  {t('Refresh your Gemma 4 financial summary')}
                 </p>
                 <p className="text-white/70 text-xs mt-0.5">
-                  Recomputes your health score, forecast, and plain-Bangla explanation from the latest data.
+                  {t('Recomputes your health score, forecast, and plain-Bangla explanation from the latest data.')}
                 </p>
               </div>
             </div>
@@ -186,7 +188,7 @@ export default function Dashboard() {
               className="btn btn-sm bg-white text-neutral hover:bg-white/90 border-none gap-2 shrink-0"
             >
               {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-              Generate summary
+              {t('Generate summary')}
             </button>
           </div>
 
@@ -194,9 +196,9 @@ export default function Dashboard() {
             {/* Recent transactions */}
             <div className="lg:col-span-2 card-surface p-2">
               <div className="flex items-center justify-between px-4 py-3">
-                <p className="font-display font-semibold text-neutral text-sm">Recent Activity</p>
+                <p className="font-display font-semibold text-neutral text-sm">{t('Recent Activity')}</p>
                 <Link to="/history" className="text-xs text-primary font-medium hover:underline">
-                  View all
+                  {t('View all')}
                 </Link>
               </div>
               <div className="divide-y divide-base-300/50">
@@ -209,11 +211,11 @@ export default function Dashboard() {
             {/* Category breakdown + loan CTA */}
             <div className="space-y-6">
               <div className="card-surface p-5">
-                <p className="font-display font-semibold text-neutral text-sm mb-3">Top Expense Categories</p>
+                <p className="font-display font-semibold text-neutral text-sm mb-3">{t('Top Expense Categories')}</p>
                 <div className="space-y-3">
                   {overview.categoryBreakdown.slice(0, 5).map((c) => (
                     <div key={c.category} className="flex items-center justify-between text-sm">
-                      <span className="text-base-content/70">{categoryLabel(c.category)}</span>
+                      <span className="text-base-content/70">{categoryLabel(c.category, language)}</span>
                       <span className="font-medium text-neutral">{formatTaka(c.amount)}</span>
                     </div>
                   ))}
@@ -232,9 +234,9 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-display font-semibold text-neutral text-sm">
-                    Check loan eligibility
+                    {t('Check loan eligibility')}
                   </p>
-                  <p className="text-xs text-base-content/50">See which lenders you qualify for</p>
+                  <p className="text-xs text-base-content/50">{t('See which lenders you qualify for')}</p>
                 </div>
               </Link>
             </div>

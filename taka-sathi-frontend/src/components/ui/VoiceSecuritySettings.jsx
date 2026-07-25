@@ -457,7 +457,7 @@ export default function VoiceSecuritySettings() {
 
             {/* Record sentence prompt */}
             <div className="p-3.5 bg-white border border-base-300 rounded-xl text-sm leading-relaxed text-center font-semibold text-neutral shadow-sm">
-              "টাকাসাথী অ্যাপে আমার কণ্ঠস্বর নিরাপত্তা নিশ্চিত করছে এবং লেনদেন নিরাপদ রাখছে।"
+              "আমি নিশ্চিত করছি যে টাকাসাথী অ্যাপে আমার কণ্ঠস্বরই আমার আসল পরিচয় এবং এর মাধ্যমে আমার সকল আর্থিক লেনদেন সুরক্ষিত ও নিরাপদ রাখছি।"
             </div>
             <p className="text-[10px] text-base-content/50 text-center">
               উপরের লেখাটি পরিষ্কারভাবে পড়ার জন্য রেকর্ড বোতামে চাপ দিন (কমপক্ষে ৫ সেকেন্ড)।
