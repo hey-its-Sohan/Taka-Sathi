@@ -58,8 +58,6 @@ We have recently integrated several high-performance UX and security enhancement
 3. **Enhanced Voice Passphrase & Matching Threshold:**
    - Expanded voice lock passphrase into a richer sentence (*"আমি নিশ্চিত করছি যে টাকাসাথী অ্যাপে আমার কণ্ঠস্বরই আমার আসল পরিচয় এবং এর মাধ্যমে আমার সকল আর্থিক লেনদেন সুরক্ষিত ও নিরাপদ রাখছি।"*) for a larger speech entropy print.
    - Standardized speaker verification matching threshold back to `0.75` (75%) for high-security constraints.
-4. **Vercel Routing and Redirect Integration:**
-   - Added `vercel.json` routing configuration to safely redirect Vite client-side routing subpages without returning 404 errors.
 
 ---
 
