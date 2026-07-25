@@ -41,6 +41,28 @@ Each folder has its own `README.md` with deeper detail — this file covers the 
 
 ---
 
+## Key Feature Updates (Hackathon Additions)
+
+We have recently integrated several high-performance UX and security enhancements:
+
+1. **Three-Way UI Language Switching:**
+   - Adds a global language toggle group scale-aligned to the top header.
+   - **Default**: Preserves original mixed English/Bengali layout.
+   - **বাং (Bengali)**: Translates all headers, menus, and transaction cards to full Bengali.
+   - **EN (English)**: Translates voice lock prompts, alerts, and instructions into clean English.
+2. **Performance-First Crowd Auto-Detect:**
+   - Integrates ambient noise level monitoring using browser `Web Audio API` (`AudioContext` and `AnalyserNode`).
+   - Downsamples frequency analytics (once every 1500ms) to save battery and CPU power on mobile webviews.
+   - Tracks consecutive speech recognition transcription failures; automatically prompts the user to activate "Avoid Crowd Mode" after 2 failures.
+   - Suspends the microphone/analyser context automatically when the browser tab is hidden using the Page Visibility API.
+3. **Enhanced Voice Passphrase & Matching Threshold:**
+   - Expanded voice lock passphrase into a richer sentence (*"আমি নিশ্চিত করছি যে টাকাসাথী অ্যাপে আমার কণ্ঠস্বরই আমার আসল পরিচয় এবং এর মাধ্যমে আমার সকল আর্থিক লেনদেন সুরক্ষিত ও নিরাপদ রাখছি।"*) for a larger speech entropy print.
+   - Standardized speaker verification matching threshold back to `0.75` (75%) for high-security constraints.
+4. **Vercel Routing and Redirect Integration:**
+   - Added `vercel.json` routing configuration to safely redirect Vite client-side routing subpages without returning 404 errors.
+
+---
+
 ## Prerequisites
 
 | Tool                                                      | Version                                                                                | Required for                                                                      |
