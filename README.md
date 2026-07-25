@@ -39,6 +39,11 @@ Each folder has its own `README.md` with deeper detail — this file covers the 
 
 **Core design principle:** Gemma 4 never computes financial numbers. All arithmetic (totals, health score, cash-flow forecast, loan eligibility) is deterministic JavaScript. Gemma 4's only job is to _structure_ free-text/voice input and _explain_ already-computed numbers in plain Bangla — see `taka-sathi-backend/README.md` §8 for the full rationale.
 
+**Key Architectural Components:**
+- **Speech Capture & Noise Monitoring (Frontend):** Uses browser Web Speech API for live transcription, and Web Audio API (`AnalyserNode`) to continuously monitor decibel levels to flag high crowd noise.
+- **Biometric Voice Lock & Shift Security (Backend):** When a transaction is logged in "Avoid Crowd Mode," the backend verifies the cashier's voice print using 1:1 acoustic energy vector angle comparison. If matched, the user ID is logged to the transaction audit trail; otherwise, the request is rejected (403).
+- **Locally-Hosted LLM Parsing (Ollama):** Forwarded transcripts are parsed by a local Ollama server running Gemma 4 (`gemma4:e4b`) to guarantee data privacy and offline capability for small shops.
+
 ---
 
 ## Key Feature Updates (Hackathon Additions)
