@@ -24,17 +24,19 @@ Each folder has its own `README.md` with deeper detail — this file covers the 
 
 ```
 [Vendor's Browser]
-       │  voice / form input
-       ▼
+  ├── Web Speech API (Transcription)
+  └── Web Audio API (Noise Monitoring)
+                     │
+                     ▼
 [React Frontend — Vite]  ──REST API (JWT)──▶  [Express Backend — MVC]
   taka-sathi-frontend                              taka-sathi-backend
                                                           │
-                                    ┌─────────────────────┼─────────────────────┐
-                                    ▼                     ▼                     ▼
-                             [MongoDB]          [Deterministic Finance    [Gemma 4 via Ollama]
-                          Users, Transactions,    Engine — cash flow,      structures voice input
-                          LoanProducts,           health score,           & explains results in
-                          FinancialSnapshots      loan rule matching]      plain Bangla
+                    ┌─────────────────────────────────────┼─────────────────────────────────────┐
+                    ▼                                     ▼                                     ▼
+             [MongoDB Atlas]                   [Deterministic Finance            [Gemma 4 via Ollama]
+          Users, Transactions,                 & Voice Verification Engine]      structures voice input
+          Voice Profiles                       (shift cashier validation         & explains results in
+                                                via 1:1 acoustic vectors)        plain Bangla
 ```
 
 **Core design principle:** Gemma 4 never computes financial numbers. All arithmetic (totals, health score, cash-flow forecast, loan eligibility) is deterministic JavaScript. Gemma 4's only job is to _structure_ free-text/voice input and _explain_ already-computed numbers in plain Bangla — see `taka-sathi-backend/README.md` §8 for the full rationale.
