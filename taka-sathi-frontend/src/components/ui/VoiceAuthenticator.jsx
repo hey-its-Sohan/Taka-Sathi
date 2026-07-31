@@ -17,12 +17,12 @@ const convertBlobToBase64 = (blob) => {
   });
 };
 
-export default function VoiceAuthenticator() {
+export default function VoiceAuthenticator({ isLockScreen = false, onVerificationSuccess = null }) {
   const toast = useToast();
   const { user, refreshUser } = useAuth();
 
   // Modes: 'enroll' (Enrollment) | 'verify' (Verification)
-  const [mode, setMode] = useState('enroll');
+  const [mode, setMode] = useState(isLockScreen ? 'verify' : 'enroll');
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -442,6 +442,9 @@ export default function VoiceAuthenticator() {
           message: 'কণ্ঠস্বর সফলভাবে যাচাই করা হয়েছে!'
         });
         toast.success(`ভয়েস মিলেছে! ম্যাচ স্কোর: ${Math.round(score * 100)}%`);
+        if (onVerificationSuccess) {
+          onVerificationSuccess();
+        }
       }
 
       // Cleanup raw audio state after successful submit
@@ -496,6 +499,9 @@ export default function VoiceAuthenticator() {
       setFailCount(0);
       setShowFallback(false);
       setFallbackPin('');
+      if (onVerificationSuccess) {
+        onVerificationSuccess();
+      }
     } else {
       toast.error('ভুল পিন কোড! অনুগ্রহ করে পুনরায় সঠিক পিন দিন।');
       playSynthSound('error');
@@ -528,24 +534,26 @@ export default function VoiceAuthenticator() {
       </div>
 
       {/* Mode Switches */}
-      <div className="tabs tabs-boxed bg-base-200 p-1 rounded-2xl w-full max-w-sm">
-        <button
-          onClick={() => handleModeChange('enroll')}
-          className={`tab flex-1 gap-2 rounded-xl text-sm font-semibold transition-all duration-200 font-bn ${
-            mode === 'enroll' ? 'tab-active bg-taka-gradient text-primary-content shadow-sm' : 'text-neutral/70'
-          }`}
-        >
-          ভয়েস সেট করুন (Enroll)
-        </button>
-        <button
-          onClick={() => handleModeChange('verify')}
-          className={`tab flex-1 gap-2 rounded-xl text-sm font-semibold transition-all duration-200 font-bn ${
-            mode === 'verify' ? 'tab-active bg-taka-gradient text-primary-content shadow-sm' : 'text-neutral/70'
-          }`}
-        >
-          ভয়েস মেলান (Verify)
-        </button>
-      </div>
+      {!isLockScreen && (
+        <div className="tabs tabs-boxed bg-base-200 p-1 rounded-2xl w-full max-w-sm">
+          <button
+            onClick={() => handleModeChange('enroll')}
+            className={`tab flex-1 gap-2 rounded-xl text-sm font-semibold transition-all duration-200 font-bn ${
+              mode === 'enroll' ? 'tab-active bg-taka-gradient text-primary-content shadow-sm' : 'text-neutral/70'
+            }`}
+          >
+            ভয়েস সেট করুন (Enroll)
+          </button>
+          <button
+            onClick={() => handleModeChange('verify')}
+            className={`tab flex-1 gap-2 rounded-xl text-sm font-semibold transition-all duration-200 font-bn ${
+              mode === 'verify' ? 'tab-active bg-taka-gradient text-primary-content shadow-sm' : 'text-neutral/70'
+            }`}
+          >
+            ভয়েস মেলান (Verify)
+          </button>
+        </div>
+      )}
 
       {/* Main Recording Panel */}
       <div className="w-full flex flex-col items-center p-6 border border-base-300/80 rounded-2xl bg-base-200/40 relative min-h-[310px] justify-center">
@@ -678,21 +686,23 @@ export default function VoiceAuthenticator() {
               <span className="h-5 w-1 bg-teal-600 rounded-full animate-pulse opacity-50"></span>
             </div>
 
-            <div className="flex gap-3 w-full max-w-xs mt-2 text-xs">
-              <button 
-                onClick={handleDeleteVoice}
-                disabled={isSubmitting}
-                className="btn btn-outline btn-error btn-sm flex-1 rounded-xl flex gap-1 items-center font-semibold"
-              >
-                <Trash2 size={13} /> ভয়েস মুছুন
-              </button>
-              <button 
-                onClick={startRecording}
-                className="btn btn-brand btn-sm flex-1 rounded-xl text-white font-semibold"
-              >
-                ভয়েস আপডেট করুন
-              </button>
-            </div>
+            {!isLockScreen && (
+              <div className="flex gap-3 w-full max-w-xs mt-2 text-xs">
+                <button 
+                  onClick={handleDeleteVoice}
+                  disabled={isSubmitting}
+                  className="btn btn-outline btn-error btn-sm flex-1 rounded-xl flex gap-1 items-center font-semibold"
+                >
+                  <Trash2 size={13} /> ভয়েস মুছুন
+                </button>
+                <button 
+                  onClick={startRecording}
+                  className="btn btn-brand btn-sm flex-1 rounded-xl text-white font-semibold"
+                >
+                  ভয়েস আপডেট করুন
+                </button>
+              </div>
+            )}
           </div>
         )}
 

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ToastProvider from './context/ToastContext.jsx';
 import LanguageProvider from './context/LanguageContext.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
+import VoiceLockGate from './components/layout/VoiceLockGate.jsx';
 import useAuth from './context/useAuth.js';
 import Loader from './components/ui/Loader.jsx';
 
@@ -36,11 +37,13 @@ export default function App() {
 
         {/* Fully protected app pages */}
         <Route element={<ProtectedRoute requireProfile={true} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/log-entry" element={<LogEntry />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/loans" element={<LoanEligibility />} />
-          <Route path="/voice-auth" element={<VoiceAuthPage />} />
+          <Route element={<VoiceLockGate />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/log-entry" element={<LogEntry />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/loans" element={<LoanEligibility />} />
+            <Route path="/voice-auth" element={<VoiceAuthPage />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<NotFound />} />

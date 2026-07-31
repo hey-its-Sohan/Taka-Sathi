@@ -38,7 +38,7 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
     volumeThreshold: -35,
     durationThreshold: 5000, // 5 seconds of loud ambient noise
     consecutiveFailuresLimit: 2,
-    cooldownTime: 300000, // 5 minutes cooldown
+    cooldownTime: 5000, // 5 seconds cooldown (for easy demo testing)
     enabled: !isSafeMode,
     onCrowdDetected: () => {
       toast.info(
