@@ -18,6 +18,10 @@ const logger = require("../utils/logger");
 const http = axios.create({
   baseURL: gemmaConfig.baseUrl,
   timeout: gemmaConfig.timeoutMs,
+  headers: {
+    "ngrok-skip-browser-warning": "true",
+    "Content-Type": "application/json",
+  },
 });
 
 /**
@@ -85,7 +89,11 @@ async function runWithTools(
   let messages = [...initialMessages];
 
   for (let i = 0; i < maxIterations; i++) {
-    const assistantMessage = await chatCompletion(messages, toolDefinitions, customTimeout);
+    const assistantMessage = await chatCompletion(
+      messages,
+      toolDefinitions,
+      customTimeout,
+    );
 
     const toolCalls = assistantMessage.tool_calls;
     if (!toolCalls || toolCalls.length === 0) {
@@ -168,7 +176,18 @@ function mockChatCompletion(messages, tools) {
 
   // Convert Bengali numerals to Western digits for robust regex matching in Mock Mode
   const cleanText = text.replace(/[০-৯]/g, (w) => {
-    const banglaDigits = {'০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'};
+    const banglaDigits = {
+      "০": "0",
+      "১": "1",
+      "২": "2",
+      "৩": "3",
+      "৪": "4",
+      "৫": "5",
+      "৬": "6",
+      "৭": "7",
+      "৮": "8",
+      "৯": "9",
+    };
     return banglaDigits[w];
   });
 
