@@ -46,8 +46,11 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-base-200 flex items-center justify-center px-4 py-10 relative overflow-hidden">
+      {/* Animated background element */}
+      <div className="absolute top-[10%] left-[-5%] w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float" />
+
+      <div className="w-full max-w-lg relative z-10 animate-fade-in-up">
         <div className="flex flex-col items-center mb-6">
           <div className="rounded-2xl bg-taka-gradient p-3 shadow-card mb-3">
             <Wallet size={24} className="text-primary-content" />

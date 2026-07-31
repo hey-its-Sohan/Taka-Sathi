@@ -45,8 +45,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-taka-gradient flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen bg-taka-gradient flex items-center justify-center px-4 py-10 relative overflow-hidden">
+      {/* Animated background blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/40 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+      <div className="w-full max-w-sm relative z-10 animate-fade-in-up">
         <div className="flex flex-col items-center mb-8">
           <div className="rounded-2xl bg-gold-gradient p-3 shadow-card mb-4">
             <Wallet size={28} className="text-secondary-content" strokeWidth={2.25} />
@@ -55,7 +59,7 @@ export default function Login() {
           <p className="font-bn text-white/70 text-sm mt-1">আপনার ব্যবসার আর্থিক সাথী</p>
         </div>
 
-        <div className="card-surface p-6 sm:p-8">
+        <div className="glass-card p-6 sm:p-8">
           {step === 'phone' ? (
             <form onSubmit={handleRequestOtp} className="space-y-5">
               <div>

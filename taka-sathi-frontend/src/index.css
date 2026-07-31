@@ -23,17 +23,55 @@ h1, h2, h3, h4 {
 
 @layer components {
   .card-surface {
-    @apply bg-base-100 rounded-2xl shadow-card border border-base-300/60;
+    @apply bg-base-100 rounded-2xl shadow-sm border border-base-300/60 transition-all hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md rounded-2xl border border-white/40 shadow-sm;
   }
 
   .btn-brand {
-    @apply btn border-none text-primary-content hover:brightness-110 transition;
+    @apply btn border-none text-primary-content hover:brightness-110 transition shadow-sm;
     background: linear-gradient(135deg, #0F766E 0%, #115E59 55%, #0B2B26 100%);
   }
 
   .stat-chip {
-    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium shadow-sm;
   }
+}
+
+/* Animations */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(15, 118, 110, 0.3)); }
+  50% { filter: drop-shadow(0 0 16px rgba(15, 118, 110, 0.6)); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s infinite;
 }
 
 /* Respect reduced-motion preference */

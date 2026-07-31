@@ -27,7 +27,7 @@ export const CATEGORY_LABELS = {
   wages: { en: 'Wages', bn: 'মজুরি' },
   loan_repayment: { en: 'Loan repayment', bn: 'ঋণ পরিশোধ' },
   personal: { en: 'Personal', bn: 'ব্যক্তিগত' },
-  other: { en: 'Other', bn: 'অন্যান্য' },
+  other: { en: 'Expense', bn: 'খরচ' },
 };
 
 export const BUSINESS_TYPE_LABELS = {

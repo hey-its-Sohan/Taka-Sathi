@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Trash2, ListFilter } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Trash2, ListFilter, X } from 'lucide-react';
 import AppShell from '../components/layout/AppShell.jsx';
 import TransactionItem from '../components/ui/TransactionItem.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
@@ -12,7 +13,9 @@ export default function History() {
   const [transactions, setTransactions] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ type: '', category: '', page: 1 });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const dateParam = searchParams.get('date');
+  const [filters, setFilters] = useState({ type: '', category: '', page: 1, date: dateParam || '' });
   const toast = useToast();
 
   const load = useCallback(async () => {
@@ -21,6 +24,14 @@ export default function History() {
       const params = { page: filters.page, limit: 20 };
       if (filters.type) params.type = filters.type;
       if (filters.category) params.category = filters.category;
+      if (filters.date) {
+        // Create full day range for the provided date string (YYYY-MM-DD)
+        const year = parseInt(filters.date.split('-')[0]);
+        const month = parseInt(filters.date.split('-')[1]) - 1;
+        const day = parseInt(filters.date.split('-')[2]);
+        params.startDate = new Date(year, month, day, 0, 0, 0).toISOString();
+        params.endDate = new Date(year, month, day, 23, 59, 59, 999).toISOString();
+      }
       const data = await transactionsApi.list(params);
       setTransactions(data.transactions);
       setPagination(data.pagination);
@@ -74,6 +85,25 @@ export default function History() {
           ))}
         </select>
       </div>
+
+      {filters.date && (
+        <div className="mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
+            Date: {new Date(filters.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            <button 
+              onClick={() => {
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('date');
+                setSearchParams(newParams);
+                setFilters(f => ({ ...f, date: '', page: 1 }));
+              }}
+              className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="card-surface p-2">
         {loading ? (

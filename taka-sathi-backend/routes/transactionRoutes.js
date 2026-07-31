@@ -34,7 +34,7 @@ router.get(
     query('startDate').optional().isISO8601(),
     query('endDate').optional().isISO8601(),
     query('page').optional().isInt({ min: 1 }),
-    query('limit').optional().isInt({ min: 1, max: 200 }),
+    query('limit').optional().isInt({ min: 1, max: 500 }),
   ],
   validateRequest,
   getTransactions

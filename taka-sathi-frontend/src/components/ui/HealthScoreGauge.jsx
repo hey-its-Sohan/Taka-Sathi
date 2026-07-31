@@ -46,7 +46,8 @@ export default function HealthScoreGauge({ score = 0, size = 176 }) {
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
-            style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
+            className={clamped >= 70 ? 'animate-pulse-glow drop-shadow-md' : 'drop-shadow-md'}
+            style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)' }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">

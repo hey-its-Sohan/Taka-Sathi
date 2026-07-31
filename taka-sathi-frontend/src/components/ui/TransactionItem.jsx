@@ -5,7 +5,7 @@ export default function TransactionItem({ transaction, onEdit, onDelete }) {
   const isIncome = transaction.type === 'income';
 
   return (
-    <div className="flex items-center gap-3 py-3.5 px-4 hover:bg-base-200/60 rounded-xl transition group">
+    <div className={`flex items-center gap-3 py-3.5 px-4 hover:bg-base-200/60 rounded-xl transition-all group border-l-4 ${isIncome ? 'border-l-transparent hover:border-l-success' : 'border-l-transparent hover:border-l-error'}`}>
       <div
         className={`rounded-full p-2 shrink-0 ${
           isIncome ? 'bg-success/10 text-success' : 'bg-error/10 text-error'
