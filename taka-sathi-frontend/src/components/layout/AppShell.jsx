@@ -22,7 +22,7 @@ function SidebarContent({ onNavigate }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral text-neutral-content w-64">
+    <div className="flex flex-col h-full bg-gradient-to-b from-neutral to-[#061614] text-neutral-content w-64 border-r border-base-300/10 shadow-xl">
       <div className="flex items-center gap-2.5 px-6 py-6">
         <div className="rounded-xl bg-gold-gradient p-2 text-secondary-content">
           <Wallet size={20} strokeWidth={2.25} />
@@ -40,9 +40,9 @@ function SidebarContent({ onNavigate }) {
             to={to}
             onClick={onNavigate}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-white/10 text-white'
+                  ? 'bg-primary/20 text-white shadow-[inset_3px_0_0_0_rgba(20,184,166,1)]'
                   : 'text-neutral-content/60 hover:bg-white/5 hover:text-white'
               }`
             }
@@ -67,7 +67,7 @@ function SidebarContent({ onNavigate }) {
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-neutral-content/60 hover:bg-white/5 hover:text-white w-full mt-1 transition"
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-neutral-content/60 hover:bg-error/20 hover:text-error w-full mt-1 transition"
         >
           <LogOut size={18} /> {t('Log out')}
         </button>

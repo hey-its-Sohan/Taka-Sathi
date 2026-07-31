@@ -28,7 +28,7 @@ export default function VoiceAuthPage() {
         <div className="tabs tabs-boxed bg-base-200 p-1 rounded-2xl w-full max-w-md mx-auto">
           <button
             onClick={() => setActiveTab('lock')}
-            className={`tab flex-1 gap-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            className={`tab flex-1 h-auto min-h-[40px] py-2 leading-tight gap-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
               activeTab === 'lock' ? 'tab-active bg-taka-gradient text-primary-content shadow-sm' : 'text-neutral/70'
             }`}
           >
@@ -36,7 +36,7 @@ export default function VoiceAuthPage() {
           </button>
           <button
             onClick={() => setActiveTab('shift')}
-            className={`tab flex-1 gap-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            className={`tab flex-1 h-auto min-h-[40px] py-2 leading-tight gap-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
               activeTab === 'shift' ? 'tab-active bg-taka-gradient text-primary-content shadow-sm' : 'text-neutral/70'
             }`}
           >

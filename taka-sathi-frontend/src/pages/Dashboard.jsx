@@ -16,6 +16,7 @@ import HealthScoreGauge from '../components/ui/HealthScoreGauge.jsx';
 import CashflowChart from '../components/ui/CashflowChart.jsx';
 import StatCard from '../components/ui/StatCard.jsx';
 import TransactionItem from '../components/ui/TransactionItem.jsx';
+import TransactionCalendar from '../components/ui/TransactionCalendar.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import Loader from '../components/ui/Loader.jsx';
 import { dashboardApi, insightsApi } from '../lib/api';
@@ -88,7 +89,7 @@ export default function Dashboard() {
   return (
     <AppShell title="Dashboard">
       {/* Mobile greeting (desktop title shown by AppShell) */}
-      <div className="lg:hidden mb-4">
+      <div className="lg:hidden mb-4 animate-fade-in-up">
         <h2 className="font-display text-xl font-bold text-neutral">
           {t('Hi')}, {user?.name?.split(' ')[0] || 'there'} 👋
         </h2>
@@ -119,7 +120,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             {/* Health score */}
             <div className="card-surface p-6 flex flex-col items-center justify-center">
               <p className="text-xs font-medium text-base-content/50 uppercase tracking-wide mb-3 self-start">
@@ -168,7 +169,7 @@ export default function Dashboard() {
           </div>
 
           {/* AI summary CTA */}
-          <div className="card-surface p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-taka-gradient">
+          <div className="glass-card p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-taka-gradient animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-start gap-3">
               <div className="rounded-lg bg-white/15 p-2 text-white shrink-0">
                 <Sparkles size={18} />
@@ -185,27 +186,23 @@ export default function Dashboard() {
             <button
               onClick={handleGenerateSummary}
               disabled={generating}
-              className="btn btn-sm bg-white text-neutral hover:bg-white/90 border-none gap-2 shrink-0"
+              className="btn btn-sm bg-white text-neutral hover:bg-white/90 disabled:bg-white/60 disabled:text-neutral/60 disabled:opacity-100 border-none gap-2 shrink-0"
             >
               {generating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
               {t('Generate summary')}
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Recent transactions */}
-            <div className="lg:col-span-2 card-surface p-2">
-              <div className="flex items-center justify-between px-4 py-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            {/* Recent transactions Calendar */}
+            <div className="lg:col-span-2 card-surface p-0 overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-5 py-4 bg-base-100/50 border-b border-base-300/40">
                 <p className="font-display font-semibold text-neutral text-sm">{t('Recent Activity')}</p>
                 <Link to="/history" className="text-xs text-primary font-medium hover:underline">
                   {t('View all')}
                 </Link>
               </div>
-              <div className="divide-y divide-base-300/50">
-                {overview.recentTransactions.map((t) => (
-                  <TransactionItem key={t._id} transaction={t} />
-                ))}
-              </div>
+              <TransactionCalendar />
             </div>
 
             {/* Category breakdown + loan CTA */}
