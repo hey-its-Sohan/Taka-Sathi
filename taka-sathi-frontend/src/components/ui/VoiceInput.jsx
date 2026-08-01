@@ -16,7 +16,7 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
   const { user, refreshUser } = useAuth();
   const isSafeMode = user?.isSafeVoiceEnabled || false;
   const toast = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -76,7 +76,9 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'bn-BD';
+    // Map app language to BCP-47 locale for the Web Speech API
+    // 'default' and 'bn' both use Bangla; only 'en' switches to English
+    recognition.lang = language === 'en' ? 'en-US' : 'bn-BD';
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -124,7 +126,7 @@ export default function VoiceInput({ onTranscriptReady, disabled }) {
         clearTimeout(silenceTimeoutRef.current);
       }
     };
-  }, []);
+  }, [language]);
 
   // Helper to convert blob to base64 data url
   const convertBlobToBase64 = (blob) => {

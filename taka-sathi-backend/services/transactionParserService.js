@@ -11,7 +11,20 @@ const { parseTransactionTool } = require('./aiTools');
  * @param {string} text - raw transcript or typed free text
  * @returns {Object} { amount, type, category, note }
  */
-async function parseTransactionText(text) {
+/**
+ * Normalizes decomposed Bengali characters (like য + ়) into their precomposed forms (য়)
+ * to fix regex matching bugs with voice transcriptions.
+ */
+function normalizeBengaliText(str) {
+  if (!str) return str;
+  return str
+    .replace(/\u09AF\u09BC/g, '\u09DF') // য + ় -> য়
+    .replace(/\u09A1\u09BC/g, '\u09DC') // ড + ় -> ড়
+    .replace(/\u09A2\u09BC/g, '\u09DD'); // ঢ + ় -> ঢ়
+}
+
+async function parseTransactionText(rawText) {
+  const text = normalizeBengaliText(rawText);
   const messages = [
     {
       role: 'system',
@@ -40,10 +53,15 @@ async function parseTransactionText(text) {
 
     if (parsed && typeof parsed.amount === 'number' && parsed.amount > 0) {
       let type = parsed.type;
-      if (type !== 'expense' && type !== 'income') {
-        const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|bought|paid|expense|spent/i;
+      const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|দিয়েছি|ধার|নিয়ে গেসে|নিয়ে গেছে|bought|paid|expense|spent|gave|give|away|lent/i;
+      
+      // Override if Gemma mistakenly classified a clear expense as income
+      if (type === 'income' && expenseKeywords.test(text)) {
+        type = 'expense';
+      } else if (type !== 'expense' && type !== 'income') {
         type = expenseKeywords.test(text) ? 'expense' : 'income';
       }
+      
       return {
         amount: Math.abs(parsed.amount),
         type,
@@ -69,7 +87,8 @@ function convertBanglaDigitsToEnglish(str) {
  * Last-resort fallback if Gemma 4 is unreachable — a naive regex parse so
  * the app degrades gracefully rather than blocking data entry entirely.
  */
-function heuristicFallbackParse(text) {
+function heuristicFallbackParse(rawText) {
+  const text = normalizeBengaliText(rawText);
   const normalizedText = convertBanglaDigitsToEnglish(text);
   const amountMatch = normalizedText.match(/(\d+(?:[.,]\d+)?)/);
   const amount = amountMatch ? parseFloat(amountMatch[1].replace(',', '')) : 0;
@@ -78,7 +97,7 @@ function heuristicFallbackParse(text) {
     throw new Error('Transaction amount must be greater than zero');
   }
 
-  const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|bought|paid|expense|spent/i;
+  const expenseKeywords = /কিনলাম|কিনেছি|খরচ|দিলাম|দিয়েছি|ধার|নিয়ে গেসে|নিয়ে গেছে|bought|paid|expense|spent|gave|give|away|lent/i;
   const isExpense = expenseKeywords.test(text);
 
   return {
