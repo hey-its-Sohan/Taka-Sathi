@@ -20,8 +20,11 @@ module.exports = {
   // Keep temperature low — this app is decision support, not creative writing.
   // Consistency of numeric interpretation matters more than variety.
   defaultOptions: {
-    temperature: 0.2,
+    temperature: 0.1,
     top_p: 0.9,
+    num_ctx: 1024,      // Limits context window to save memory and speed up prompt processing
+    num_predict: 256,   // Limits max generated tokens to avoid runaway text generation
+    num_thread: 6,      // Sets optimal thread count for an 8-core CPU setup
   },
   systemPrompt: `You are TakaSathi, a financial advisor for small business owners in Bangladesh.
 Always respond in simple, plain Bangla suitable for a reader with basic literacy, unless the user's profile language is "en".

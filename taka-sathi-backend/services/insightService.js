@@ -118,8 +118,7 @@ Respond ONLY with a JSON object (no markdown, no extra text) in this exact shape
   "warningMessage": "${cashflow.willGoNegative ? `1-2 sentence urgent but constructive warning that cash flow may go negative around ${cashflow.negativeOnDate}, with one concrete suggestion, in ${language === "bn" ? "plain Bangla" : "plain English"}` : "empty string since there is no warning"}"
 }`;
 
-  const raw = await gemmaService.generateText(prompt, { timeout: gemmaConfig.summaryTimeoutMs });
-  return safeParseJsonResponse(raw, {
+  const fallback = {
     summaryText:
       current.netProfit >= 0
         ? "আপনার ব্যবসা লাভজনক অবস্থায় আছে।"
@@ -128,7 +127,15 @@ Respond ONLY with a JSON object (no markdown, no extra text) in this exact shape
     warningMessage: cashflow.willGoNegative
       ? "সতর্কতা: আপনার নগদ প্রবাহ শীঘ্রই ঋণাত্মক হতে পারে। খরচ কমানোর কথা বিবেচনা করুন।"
       : "",
-  });
+  };
+
+  try {
+    const raw = await gemmaService.generateText(prompt, { timeout: gemmaConfig.summaryTimeoutMs, jsonMode: true });
+    return safeParseJsonResponse(raw, fallback);
+  } catch (err) {
+    console.warn("[insightService] Gemma narrative generation timed out or failed. Using fallback:", err.message);
+    return fallback;
+  }
 }
 
 /**

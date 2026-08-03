@@ -38,6 +38,8 @@ export const TRANSLATIONS = {
   'Gemma 4 is structuring your entry…': { en: 'Gemma 4 is structuring your entry…', bn: 'Gemma 4 আপনার এন্ট্রি সাজাচ্ছে…' },
   'Transaction saved — parsed by Gemma 4': { en: 'Transaction saved — parsed by Gemma 4', bn: 'লেনদেন সংরক্ষিত হয়েছে — Gemma 4 দ্বারা পার্সড' },
   'Transaction saved': { en: 'Transaction saved', bn: 'লেনদেন সংরক্ষিত হয়েছে' },
+  'Transaction deleted': { en: 'Transaction deleted', bn: 'লেনদেন মুছে ফেলা হয়েছে' },
+  'Delete Entry': { en: 'Delete Entry', bn: 'এন্ট্রি মুছুন' },
   
   // Voice Input original Bangla keys translation
   'শুনছি… কথা বলুন': { en: 'Listening... Speak now', bn: 'শুনছি… কথা বলুন' },

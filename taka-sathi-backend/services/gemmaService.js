@@ -30,7 +30,7 @@ const http = axios.create({
  * @param {Array} [tools] - OpenAI-style tool/function definitions
  * @returns {Object} raw assistant message object { role, content, tool_calls? }
  */
-async function chatCompletion(messages, tools = null, customTimeout = null) {
+async function chatCompletion(messages, tools = null, customTimeout = null, jsonMode = false) {
   if (gemmaConfig.mockMode) {
     return mockChatCompletion(messages, tools);
   }
@@ -44,6 +44,9 @@ async function chatCompletion(messages, tools = null, customTimeout = null) {
     };
     if (tools && tools.length > 0) {
       payload.tools = tools;
+    }
+    if (jsonMode) {
+      payload.response_format = { type: "json_object" };
     }
 
     const config = {};
@@ -149,12 +152,12 @@ async function runWithTools(
  * once all numbers are already computed deterministically and just need
  * to be turned into plain-Bangla prose.
  */
-async function generateText(userPrompt, { systemPrompt, timeout } = {}) {
+async function generateText(userPrompt, { systemPrompt, timeout, jsonMode = false } = {}) {
   const messages = [
     { role: "system", content: systemPrompt || gemmaConfig.systemPrompt },
     { role: "user", content: userPrompt },
   ];
-  const message = await chatCompletion(messages, null, timeout);
+  const message = await chatCompletion(messages, null, timeout, jsonMode);
   return message.content || "";
 }
 

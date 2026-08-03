@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Mic, Keyboard, CheckCircle2, Loader2 } from 'lucide-react';
+import { Mic, Keyboard, CheckCircle2, Loader2, Trash2 } from 'lucide-react';
 import AppShell from '../components/layout/AppShell.jsx';
 import VoiceInput from '../components/ui/VoiceInput.jsx';
 import TransactionForm from '../components/ui/TransactionForm.jsx';
@@ -11,9 +11,24 @@ import useLanguage from '../context/useLanguage.js';
 export default function LogEntry() {
   const [mode, setMode] = useState('voice'); // 'voice' | 'manual'
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
   const toast = useToast();
   const { t } = useLanguage();
+
+  const handleDeleteLastSaved = useCallback(async () => {
+    if (!lastSaved) return;
+    setDeleting(true);
+    try {
+      await transactionsApi.remove(lastSaved._id);
+      toast.success(t('Transaction deleted'));
+      setLastSaved(null);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setDeleting(false);
+    }
+  }, [lastSaved, toast, t]);
 
   const handleVoiceTranscript = useCallback(async (rawInputText, audioDetails = null) => {
     setSubmitting(true);
@@ -79,17 +94,31 @@ export default function LogEntry() {
         )}
 
         {lastSaved && !submitting && (
-          <div className="card-surface p-4 mt-4 flex items-center gap-3 border-l-4 border-success/40">
-            <CheckCircle2 size={20} className="text-success shrink-0" />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-neutral">
-                {lastSaved.type === 'income' ? '+' : '-'}
-                {formatTaka(lastSaved.amount)} · {categoryLabel(lastSaved.category)}
-              </p>
-              {lastSaved.note && (
-                <p className="text-xs text-base-content/50 truncate">{lastSaved.note}</p>
-              )}
+          <div className="card-surface p-4 mt-4 flex items-center justify-between gap-3 border-l-4 border-success/40 animate-fade-in-up">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <CheckCircle2 size={20} className="text-success shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-neutral">
+                  {lastSaved.type === 'income' ? '+' : '-'}
+                  {formatTaka(lastSaved.amount)} · {categoryLabel(lastSaved.category)}
+                </p>
+                {lastSaved.note && (
+                  <p className="text-xs text-base-content/50 truncate">{lastSaved.note}</p>
+                )}
+              </div>
             </div>
+            <button
+              onClick={handleDeleteLastSaved}
+              disabled={deleting}
+              className="btn btn-ghost btn-sm btn-circle text-error hover:bg-error/10 shrink-0"
+              title={t('Delete Entry')}
+            >
+              {deleting ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <Trash2 size={16} />
+              )}
+            </button>
           </div>
         )}
       </div>

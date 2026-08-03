@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const FinancialSnapshot = require('../models/FinancialSnapshot');
 const insightService = require('../services/insightService');
 const { success, ApiError } = require('../utils/apiResponse');
+// Force nodemon restart to clear hung connections
 
 /**
  * POST /api/insights/summary

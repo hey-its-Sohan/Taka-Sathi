@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const FinancialSnapshot = require('../models/FinancialSnapshot');
 const voiceVerificationService = require('../services/voiceVerificationService');
 const transactionParserService = require('../services/transactionParserService');
 const { success, ApiError } = require('../utils/apiResponse');
@@ -157,6 +158,10 @@ const updateTransaction = asyncHandler(async (req, res) => {
 const deleteTransaction = asyncHandler(async (req, res) => {
   const transaction = await Transaction.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
   if (!transaction) throw new ApiError(404, 'Transaction not found');
+  
+  // Clear the cached financial snapshot so the dashboard reflects that numbers need recalculation
+  await FinancialSnapshot.deleteMany({ userId: req.user._id });
+
   return success(res, { message: 'Transaction deleted' });
 });
 
